@@ -1,5 +1,3 @@
-// Use the endpoint at https://pelp-api-wdi.herokuapp.com/markers to get all markers stored in a database. The database currently holds zero markers. Markers store information related to a business, using yelp data and its own data. 
-// Create a user interface that searches the yelp API at https://pelp-api-wdi.herokuapp.com/search, using term and location.
 // Create an interface that allows a user to click a result and save it to the database, using information from the yelp result and additional information that the user adds (type of place).
 // To create a marker in the database, send a request to the same endpoint used to get the markers from the database, but using a POST request. The data that needs to be passed to a Marker are:
 // name, address, rating, img_url, latitude, longitude, yelp_id, marker_type
@@ -8,4 +6,61 @@
 // If a new Marker is added to the database from another user’s browser, the map should automatically update on any other user’s browser. 
 // Store the Markers returned from the database in Marker objects
 // Each marker type should have an icon associated with it in place of the default google maps marker. Markers with type coffee should have a coffee icon, pizza should have a pizza icon. 
-// Add Comment
+
+
+var search = document.getElementsByClassName("search")[0];
+var results = document.getElementsByClassName("results")[0];
+
+search.addEventListener("click", function(){
+	var food = document.getElementsByClassName("food")[0].value;
+	var location = document.getElementsByClassName("location")[0].value;
+	searchYelp(food, location);
+})
+
+
+
+function searchYelp(searchText, searchLocation){
+    $.ajax({
+        url: "https://yelp-search.herokuapp.com/search",
+        method: "GET",
+        data: {
+            term: searchText,
+            location: searchLocation,
+            radius: 1000,
+            sort_by: "rating"
+
+        },
+        success: function(responseObj){
+            console.log(responseObj);
+            listResults(responseObj);
+        }
+
+    })
+}
+
+function listResults(responseObj){
+	var i = 0;
+	responseObj.businesses.forEach(function(business){
+		results.innerHTML += "<div class='business business" + i + "'><p class='bizName'>" + business.name + "</p><p class='bizAddress'>" + business.location.address[0] + "</p></div>";
+		i += 1;
+	})
+}
+
+function searchMap(searchText, searchLocation){
+    $.ajax({
+        url: "https://pelp-api-wdi.herokuapp.com/markers",
+        method: "GET",
+        data: {
+            term: searchText,
+            location: searchLocation,
+            radius: 1000,
+            sort_by: "rating"
+
+        },
+        success: function(response){
+            console.log(response);
+        }
+
+    })
+}
+
