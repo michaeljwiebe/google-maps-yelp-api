@@ -9,12 +9,17 @@
 <body>
 	<input class="food" type="text" placeholder="Food" value="pho">
 	<input class="location" type="text" placeholder="Location" value="west philly">
-	<input class="search" type="submit" placeholder="Search">
+	<input class="search" type="submit" value="Search">
 	<div class="map"></div>
+	<input class="populateMarkers" type="submit" value="Populate Markers"></input>
 	<div class="results"></div>
 
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script type="text/javascript" src="scripts.js"></script>
+	<script async defer
+	  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA4KY0Npw5sUzY5TLc76ke31pvAaYGjnyk&callback=initMap">
+	</script>
+	
 </body>
 </html>

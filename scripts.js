@@ -11,11 +11,19 @@
 
 var search = document.getElementsByClassName("search")[0];
 var results = document.getElementsByClassName("results")[0];
+var markersObject;
+var populateMarkers = document.getElementsByClassName("populateMarkers")[0];
+var map;
+
+
 
 search.addEventListener("click", function(){
 	var food = document.getElementsByClassName("food")[0].value;
 	var location = document.getElementsByClassName("location")[0].value;
 	searchYelp(food, location);
+})
+populateMarkers.addEventListener("click", function(){
+	getFromDatabase();
 })
 
 
@@ -32,7 +40,6 @@ function searchYelp(searchText, searchLocation){
 
         },
         success: function(responseObj){
-            console.log(responseObj);
             listResults(responseObj);
         }
 
@@ -40,6 +47,7 @@ function searchYelp(searchText, searchLocation){
 }
 
 function listResults(responseObj){
+	results.innerHTML = "";
 	var i = 0;
 	responseObj.businesses.forEach(function(business){
 		var j = i;
@@ -51,19 +59,17 @@ function listResults(responseObj){
 			i += 1;
 	});
 };
+
 function addButtons(businessDiv, business){
 	businessDiv.addEventListener("click", function(){
-			console.log("click");
 			addToDatabase(business);
-
-		});
+	});
 }
 
 function addToDatabase(business){
-	console.log(business);
     $.ajax({
         url: "https://pelp-api-wdi.herokuapp.com/markers",
-        method: "post",
+        method: "POST",
         data: {marker: { 
         	name: business.name,
         	address: business.location.address[0],
@@ -76,9 +82,42 @@ function addToDatabase(business){
         	}
         },
         success: function(response){
-            console.log("sucessful post");
         }
-
     })
+}
+
+function getFromDatabase(){
+	    $.ajax({
+        url: "https://pelp-api-wdi.herokuapp.com/markers",
+        method: "GET",
+        data: {
+        },
+        success: function(response){
+            markersObject = response;
+            addMarkers(response);
+        }
+    })
+}
+
+function addMarkers(markersObj){
+	markersObj.markers.forEach(function(business){
+		var bizCoordinates = {
+			lat: business.latitude,
+			lng: business.longitude
+		}
+		var marker = new google.maps.Marker({
+			position: bizCoordinates,
+			map: map
+		})
+	})
+}
+
+function initMap(){
+	var philly = {lat: 39.9691826, lng: -75.1338785};
+
+	map = new google.maps.Map(document.getElementsByClassName('map')[0], {
+		zoom: 12,
+		center: philly
+	});
 }
 
