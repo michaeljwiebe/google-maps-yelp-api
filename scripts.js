@@ -1,6 +1,7 @@
+// Use the endpoint at https://pelp-api-wdi.herokuapp.com/markers to get all markers stored in a database. The database currently holds zero markers. Markers store information related to a business, using yelp data and its own data. 
+// Create a user interface that searches the yelp API at https://pelp-api-wdi.herokuapp.com/search, using term and loca
 // Create an interface that allows a user to click a result and save it to the database, using information from the yelp result and additional information that the user adds (type of place).
 // To create a marker in the database, send a request to the same endpoint used to get the markers from the database, but using a POST request. The data that needs to be passed to a Marker are:
-// name, address, rating, img_url, latitude, longitude, yelp_id, marker_type
 // Name refers to the business’ name, marker_type refers to the type of establishment it is (cafe, lunch, pizza, bagels, etc.)
 // Using the Google Maps API, show a map on the page that has a map marker for every Marker in the database. If a new Marker is added to the database, a new map marker should appear on the map.
 // If a new Marker is added to the database from another user’s browser, the map should automatically update on any other user’s browser. 
@@ -41,24 +42,41 @@ function searchYelp(searchText, searchLocation){
 function listResults(responseObj){
 	var i = 0;
 	responseObj.businesses.forEach(function(business){
+		var j = i;
 		results.innerHTML += "<div class='business business" + i + "'><p class='bizName'>" + business.name + "</p><p class='bizAddress'>" + business.location.address[0] + "</p></div>";
-		i += 1;
-	})
+		setTimeout(function(){
+			var businessDiv = document.getElementsByClassName("business" + j)[0];
+			addButtons(businessDiv, business)
+		}, 1);
+			i += 1;
+	});
+};
+function addButtons(businessDiv, business){
+	businessDiv.addEventListener("click", function(){
+			console.log("click");
+			addToDatabase(business);
+
+		});
 }
 
-function searchMap(searchText, searchLocation){
+function addToDatabase(business){
+	console.log(business);
     $.ajax({
         url: "https://pelp-api-wdi.herokuapp.com/markers",
-        method: "GET",
-        data: {
-            term: searchText,
-            location: searchLocation,
-            radius: 1000,
-            sort_by: "rating"
-
+        method: "post",
+        data: {marker: { 
+        	name: business.name,
+        	address: business.location.address[0],
+        	rating: business.rating,
+        	img_url: business.img_url,
+        	latitude: business.location.coordinate.latitude,
+        	longitude: business.location.coordinate.longitude,
+        	yelp_id: business.id,
+        	marker_type: business.categories[0][0]
+        	}
         },
         success: function(response){
-            console.log(response);
+            console.log("sucessful post");
         }
 
     })
